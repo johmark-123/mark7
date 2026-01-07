@@ -1,0 +1,49 @@
+<?php
+require 'db.php';
+$message = "";
+
+if (isset($_POST['register'])) {
+    $user = $_POST['username'];
+    $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    
+    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+    $stmt->bind_param("ss", $user, $pass);
+    
+    if ($stmt->execute()) {
+        header("Location: login.php?msg=success|Account created! Please login.");
+        exit;
+    } else {
+        $message = "error|Username already exists.";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register | Payroll Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: white; }
+        .glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .glass-input { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; outline: none; }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6">
+    <div class="glass p-10 rounded-3xl w-full max-w-md text-center">
+        <h1 class="text-3xl font-bold mb-2">Join Us</h1>
+        <p class="text-blue-100 opacity-70 mb-8 text-sm">Create your admin account</p>
+        
+        <?php echo getMessage($message); ?>
+
+        <form method="post" class="space-y-4">
+            <input type="text" name="username" placeholder="Username" class="glass-input w-full p-4 rounded-xl" required>
+            <input type="password" name="password" placeholder="Password" class="glass-input w-full p-4 rounded-xl" required>
+            <button type="submit" name="register" class="w-full bg-indigo-500 text-white font-bold p-4 rounded-xl hover:scale-105 transition">Create Account</button>
+        </form>
+        
+        <p class="mt-6 text-sm opacity-80">Already have an account? <a href="login.php" class="font-bold underline">Login here</a></p>
+    </div>
+</body>
+</html>
